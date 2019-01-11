@@ -3,6 +3,8 @@
     package="com.wang.myandroid">
 
     <!-- 读取Log -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.READ_LOGS" />
     <!-- 允许联网 -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -38,6 +40,10 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <!-- SD卡读取权限，用户写入离线定位数据 -->
     <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+
+    <uses-feature android:name="android.bluetooth.le" android:required="true" /> <!-- Android 5.0之前是android.hardware.bluetooth_le -->
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
 
     <application
         android:name=".application.App"
@@ -111,7 +117,10 @@
             android:enabled="true"
             android:process=":remote" />
 
-        <activity android:name=".ui.AboutActivity"></activity>
+        <activity android:name=".ui.AboutActivity" />
+        <activity android:name=".ui.ShowActivity" />
+        <activity android:name=".ui.BleActivity" />
+        <activity android:name=".ui.BleDemo"></activity>
     </application>
 
 </manifest>
