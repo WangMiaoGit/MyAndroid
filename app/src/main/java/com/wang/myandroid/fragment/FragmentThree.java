@@ -3,12 +3,16 @@ package com.wang.myandroid.fragment;
 
 import android.os.Bundle;
 
+import android.os.Handler;
+import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -18,6 +22,13 @@ import android.widget.TextView;
 import com.kymjs.rxvolley.RxVolley;
 import com.kymjs.rxvolley.client.HttpCallback;
 import com.kymjs.rxvolley.http.VolleyError;
+import com.scwang.smartrefresh.layout.SmartRefreshLayout;
+import com.scwang.smartrefresh.layout.api.RefreshLayout;
+import com.scwang.smartrefresh.layout.constant.SpinnerStyle;
+import com.scwang.smartrefresh.layout.footer.BallPulseFooter;
+import com.scwang.smartrefresh.layout.header.BezierRadarHeader;
+import com.scwang.smartrefresh.layout.listener.OnLoadMoreListener;
+import com.scwang.smartrefresh.layout.listener.OnRefreshListener;
 import com.wang.myandroid.R;
 import com.wang.myandroid.adapter.GridAdapter;
 import com.wang.myandroid.entity.GirlData;
@@ -50,6 +61,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -66,6 +78,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
  */
 public class FragmentThree extends Fragment {
 
+    private static final String TAG = "FragmentThree";
     //列表
     private GridView mGridView;
     //数据
@@ -81,6 +94,33 @@ public class FragmentThree extends Fragment {
     //PhotoView 可拖拽图片
     private PhotoViewAttacher mAttacher;
 
+    private SmartRefreshLayout smartRefreshLayout;
+
+    private  int page = 1;
+    private  int ref_page = 1;
+    private  int pre_page = 0;
+
+    Handler myHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case 0:
+
+                    pre_page = ref_page;
+                    Random random = new Random();
+                    int i = random.nextInt(10)+1;
+                    while (i==pre_page){
+                        i = random.nextInt(10)+1;
+                    }
+                    ref_page = i;
+                    break;
+                case 1:
+
+                    page++;
+                    break;
+            }
+        }
+    };
 
     /**
      * 1.监听点击事件
@@ -101,8 +141,12 @@ public class FragmentThree extends Fragment {
     //初始化View
     private void findView(View view) {
 
+        smartRefreshLayout = view.findViewById(R.id.refreshLayout);
         mGridView = view.findViewById(R.id.mGridView);
-        TextView textView = view.findViewById(R.id.tv_empty);
+        TextView textView = new TextView(getContext());
+        textView.setText("暂无数据");
+
+//        TextView textView = view.findViewById(R.id.tv_empty);
         mGridView.setEmptyView(textView);
 
         //初始化提示框  点击图片弹出的可缩放 框
@@ -112,6 +156,61 @@ public class FragmentThree extends Fragment {
 
         iv_img = dialog.findViewById(R.id.iv_img);
 
+        getPic(ref_page, 1);
+
+
+        mAdapter = new GridAdapter(getActivity(), mList);
+        //设置适配器
+        mGridView.setAdapter(mAdapter);
+
+        //监听点击事件
+        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //解析图片
+                PicassoUtil.loadImgView(mListUrl.get(position), iv_img);
+                //缩放
+                mAttacher = new PhotoViewAttacher(iv_img);
+                //刷新
+                mAttacher.update();
+                dialog.show();
+            }
+        });
+
+        //设置 Header 为 贝塞尔雷达 样式
+//        smartRefreshLayout.setRefreshHeader(new BezierRadarHeader(getContext()).setEnableHorizontalDrag(true));
+        //设置 Footer 为 球脉冲 样式
+//        smartRefreshLayout.setRefreshFooter(new BallPulseFooter(getContext()).setSpinnerStyle(SpinnerStyle.Scale));
+
+        smartRefreshLayout.setOnRefreshListener(new OnRefreshListener() {
+            @Override
+            public void onRefresh(RefreshLayout refreshlayout) {
+                refreshlayout.finishRefresh(2000/*,false*/);//传入false表示刷新失败
+
+
+                getPic(ref_page, 0);
+                Log.d(TAG, "刷新");
+                System.out.println("刷新到第" + page + "页");
+//                mAdapter.notifyDataSetChanged();
+            }
+        });
+        smartRefreshLayout.setOnLoadMoreListener(new OnLoadMoreListener() {
+            @Override
+            public void onLoadMore(RefreshLayout refreshlayout) {
+                refreshlayout.finishLoadMore(2000/*,false*/);//传入false表示加载失败
+                getPic(page, 1);
+//                mAdapter.notifyDataSetChanged();
+                Log.d(TAG, "加载");
+                System.out.println("加载到第" + page + "页");
+            }
+        });
+    }
+
+    private void getPic(int i, int model) {
+        if (model == 0) {
+            mList.clear();
+            mListUrl.clear();
+        }
         String welfare = null;
         try {
             //Gank升級 需要转码
@@ -130,15 +229,15 @@ public class FragmentThree extends Fragment {
          *
          */
         String url1 = "https://gank.io/api/data/";
-        String url2 = "/20/2";
+        String url2 = "/20/" + i;
         String url = url1 + welfare + url2;
-        LogUtil.d(url);
+        LogUtil.d("加载的url======" + url);
         //解析
         RxVolley.get(url, new HttpCallback() {
             @Override
             public void onSuccess(String t) {
                 LogUtil.i("Girl Json:" + t);
-                parsingJson(t);
+                parsingJson(t, model);
             }
 
             @Override
@@ -146,25 +245,10 @@ public class FragmentThree extends Fragment {
                 LogUtil.e(error.toString());
             }
         });
-
-
-        //监听点击事件
-        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //解析图片
-                PicassoUtil.loadImgView(mListUrl.get(position), iv_img);
-                //缩放
-                mAttacher = new PhotoViewAttacher(iv_img);
-                //刷新
-                mAttacher.update();
-                dialog.show();
-            }
-        });
     }
 
     //解析Json
-    private void parsingJson(String t) {
+    private void parsingJson(String t, int model) {
         try {
             JSONObject jsonObject = new JSONObject(t);
             JSONArray jsonArray = jsonObject.getJSONArray("results");
@@ -177,15 +261,16 @@ public class FragmentThree extends Fragment {
                 data.setImgUrl(url);
                 mList.add(data);
             }
-            mAdapter = new GridAdapter(getActivity(), mList);
-            //设置适配器
-            mGridView.setAdapter(mAdapter);
+            if (model == 0) {
+                myHandler.sendEmptyMessage(0);
+            } else {
+                myHandler.sendEmptyMessage(1);
+            }
+            mAdapter.notifyDataSetChanged();
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
-
-
 
 
     //没有解决301的问题
