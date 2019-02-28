@@ -9,15 +9,20 @@
     android:gravity="center"
     >
 
-        <ImageView
-            android:id="@+id/img1"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:layout_gravity="center"
-            android:focusable="true"
-            android:layout_centerInParent="true"
-            android:src="@drawable/ic_android_black_24dp"
+        <!--<ImageView-->
+            <!--android:id="@+id/img1"-->
+            <!--android:layout_width="72dp"-->
+            <!--android:layout_height="72dp"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:focusable="true"-->
+            <!--android:layout_centerInParent="true"-->
+            <!--android:src="@drawable/ic_android_black_24dp"-->
             />
+        <ImageView
+            android:id="@+id/image_anim"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ball"/>
 
 
 

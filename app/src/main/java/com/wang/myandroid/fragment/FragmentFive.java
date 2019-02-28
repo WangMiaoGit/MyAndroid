@@ -14,6 +14,7 @@ import com.wang.myandroid.R;
 import com.wang.myandroid.common.blu.BleUtil;
 import com.wang.myandroid.ui.BleActivity;
 import com.wang.myandroid.ui.BleDemo;
+import com.wang.myandroid.ui.ShowActivity;
 
 
 /**
@@ -37,9 +38,9 @@ private Button btn_go;
         btn_go.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent = new Intent(getContext(), ShowActivity.class);
+                Intent intent = new Intent(getContext(), ShowActivity.class);
 //                Intent intent = new Intent(getContext(), BleActivity.class);
-                Intent intent = new Intent(getContext(), BleDemo.class);
+//                Intent intent = new Intent(getContext(), BleDemo.class);
                 startActivity(intent);
             }
         });

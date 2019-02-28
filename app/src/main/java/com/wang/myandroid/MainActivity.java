@@ -76,7 +76,7 @@ public class MainActivity extends BaseActivity {
         mFragments = new ArrayList<>();
         mFragments.add(new Fragment0ne());
         mFragments.add(new Fragment1());
-        mFragments.add(new Fragment2());
+        mFragments.add(new FragmentThree());
         mFragments.add(new FragmentFour());
         mFragments.add(new FragmentFive());
     }
@@ -142,5 +142,6 @@ public class MainActivity extends BaseActivity {
 
 
     }
+
 
 }

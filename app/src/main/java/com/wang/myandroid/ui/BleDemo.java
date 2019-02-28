@@ -30,6 +30,9 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+/**
+ * 手环蓝牙 RFID 读取设备
+ */
 public class BleDemo extends AppCompatActivity {
     protected BU01_Reader reader;
     private BU01_Service service;

@@ -60,18 +60,21 @@ public class GridAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder = null;
+
+        data = mList.get(position);
+        //解析图片
+        String url = data.getImgUrl();
         if(convertView == null){
             viewHolder = new ViewHolder();
             convertView = inflater.inflate(R.layout.girl_item,null);
             viewHolder.imageView = convertView.findViewById(R.id.imageview);
             convertView.setTag(viewHolder);
+//            viewHolder.imageView.setTag(url);//给imageView设置TAG  避免加载图片发送错误
         }else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        data = mList.get(position);
-        //解析图片
-        String url = data.getImgUrl();
+
 
         PicassoUtil.loadImgViewSize(url,width/2,500,viewHolder.imageView);
 
