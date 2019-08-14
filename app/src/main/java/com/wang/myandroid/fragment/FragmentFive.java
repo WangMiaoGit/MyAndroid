@@ -21,7 +21,8 @@ import com.wang.myandroid.ui.BleDemo;
  */
 public class FragmentFive extends Fragment {
 
-private Button btn_go;
+    private Button btn_go;
+
     public FragmentFive() {
         // Required empty public constructor
     }
@@ -31,7 +32,7 @@ private Button btn_go;
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_fragment_five, container, false);
+        View view = inflater.inflate(R.layout.fragment_fragment_five, container, false);
 
         btn_go = view.findViewById(R.id.btn_go);
         btn_go.setOnClickListener(new View.OnClickListener() {
@@ -39,11 +40,10 @@ private Button btn_go;
             public void onClick(View v) {
 //                Intent intent = new Intent(getContext(), ShowActivity.class);
 //                Intent intent = new Intent(getContext(), BleActivity.class);
-                Intent intent = new Intent(getContext(), BleDemo.class);
+                Intent intent = new Intent(getContext(), BleActivity.class);
                 startActivity(intent);
             }
         });
-
 
 
         return view;
